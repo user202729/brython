@@ -172,6 +172,10 @@ httpd.server_port = port
 print(__doc__)
 print(("Server running on port http://localhost:{}.".format(server_address[1])))
 print("Press CTRL+C to Quit.")
-open_new_tab("http://localhost:{}/".format(server_address[1]))
-httpd.serve_forever()
-
+# open_new_tab("http://localhost:{}/".format(server_address[1]))
+try:
+	httpd.serve_forever()
+except KeyboardInterrupt:
+	pass
+httpd.shutdown()
+httpd.server_close()
