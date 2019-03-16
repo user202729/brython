@@ -2532,8 +2532,6 @@ var $DefCtx = $B.parser.$DefCtx = function(context){
             node.enter_frame = true
         })
 
-        nodes = nodes.concat(enter_frame_nodes)
-
         nodes.push($NodeJS("var $nb_defaults = Object.keys($defaults).length,"))
         nodes.push($NodeJS("    $parent = $locals.$parent"))
 
@@ -2643,6 +2641,8 @@ var $DefCtx = $B.parser.$DefCtx = function(context){
             nodes.push(make_args_nodes[0])
             if(make_args_nodes.length > 1){nodes.push(make_args_nodes[1])}
         }
+
+        nodes = nodes.concat(enter_frame_nodes)
 
         nodes.push($NodeJS('$top_frame[1] = $locals;'))
         nodes.push($NodeJS('$locals.$parent = $parent'))
@@ -2855,7 +2855,7 @@ var $DefCtx = $B.parser.$DefCtx = function(context){
         func_name = func_name || this.tree[0].to_js()
         if(this.decorated){func_name = 'var ' + this.alias}
 
-        return "var " + this.name + '$' + this.num + 
+        return "var " + this.name + '$' + this.num +
             ' = function($defaults){' +
             (this.async ? 'async ' : '') + 'function '+
             this.name + this.num + '(' + this.params + ')'
@@ -2891,7 +2891,7 @@ var $DelCtx = $B.parser.$DelCtx = function(context){
             switch(expr.type) {
                 case 'id':
                     // cf issue #923
-                    var res = 'delete ' + expr.to_js() + ';'
+                    var res = '$B.$delete("' + expr.value + '");'
                     delete $get_scope(this).binding[expr.value]
                     return res
                 case 'list_or_tuple':
@@ -8614,10 +8614,12 @@ var $transition = $B.parser.$transition = function(context, token, value){
 
 // Names that can't be given to variable names or attributes
 $B.forbidden = ["alert", "arguments", "case", "catch", "const", "constructor",
-    "Date", "delete", "default", "document", "enum", "eval", "extends",
-    "Error", "history", "function", "keys", "length", "location", "Math",
-    "new", "null", "Number", "RegExp", "super", "this","throw", "var",
-    "window", "toLocaleString", "toString", "message"]
+    "Date", "debugger", "delete", "default", "do", "document", "enum",
+    "export", "eval", "extends", "Error", "history", "function", "instanceof",
+    "keys", "length", "location", "Math", "message","new", "null", "Number",
+    "RegExp", "super", "switch", "this", "throw", "typeof", "var", "window", 
+    "toLocaleString", "toString", "void"]
+    //enum, export, extends, import, and super
 $B.aliased_names = $B.list2obj($B.forbidden)
 
 var s_escaped = 'abfnrtvxuU"0123456789' + "'" + '\\',
